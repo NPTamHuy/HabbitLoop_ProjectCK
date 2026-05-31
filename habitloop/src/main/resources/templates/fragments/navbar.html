@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<aside th:fragment="sidebar" class="sidebar">
+    <div class="sidebar-logo">
+        <div class="logo-icon">🔥</div>
+        HabitLoop
+    </div>
+    <nav class="sidebar-nav">
+        <a href="/dashboard" class="nav-item"
+           th:classappend="${activePage == 'dashboard'} ? ' active' : ''">
+            <i class="ti ti-layout-dashboard"></i> Dashboard
+        </a>
+        <a href="/habits" class="nav-item"
+           th:classappend="${activePage == 'habits'} ? ' active' : ''">
+            <i class="ti ti-repeat"></i> Habits
+        </a>
+        <a href="/challenges" class="nav-item"
+           th:classappend="${activePage == 'challenges'} ? ' active' : ''">
+            <i class="ti ti-trophy"></i> Challenges
+        </a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="nav-item" style="color:#18181b; font-weight:500;">
+            <i class="ti ti-user"></i>
+            <span th:text="${currentUser != null ? currentUser.username : ''}"></span>
+        </div>
+        <a href="/auth/logout" class="nav-item" style="color:#ef4444;">
+            <i class="ti ti-logout"></i> Đăng xuất
+        </a>
+    </div>
+</aside>
+</body>
+</html>

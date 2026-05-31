@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>HabitLoop - Habits</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+</head>
+<body>
+<div class="app-layout">
+    <div th:replace="~{fragments/navbar :: sidebar}" th:with="activePage='habits'"></div>
+
+    <main class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="page-title">Habits của tôi</div>
+                <div class="page-subtitle">Theo dõi và duy trì thói quen hằng ngày</div>
+            </div>
+            <div class="topbar-right">
+                <div class="notif-wrapper">
+                    <button class="bell-btn" id="bell-btn">
+                        <i class="ti ti-bell"></i>
+                        <div class="bell-dot" id="notif-badge" style="display:none;"></div>
+                    </button>
+                    <div class="notif-dropdown" id="notif-dropdown">
+                        <div class="notif-header">
+                            <span>Thông báo</span>
+                            <form th:action="@{/notifications/read-all}" method="post">
+                                <button type="submit" class="notif-read-btn">Đọc tất cả</button>
+                            </form>
+                        </div>
+                        <div id="notif-list"></div>
+                    </div>
+                </div>
+                <a href="/habits/create" class="btn-primary">
+                    <i class="ti ti-plus"></i> Tạo habit
+                </a>
+            </div>
+        </div>
+
+        <div th:if="${message}" class="alert alert-success">
+            <i class="ti ti-check"></i> <span th:text="${message}"></span>
+        </div>
+        <div th:if="${success}" class="alert alert-success">
+            <i class="ti ti-check"></i> <span th:text="${success}"></span>
+        </div>
+
+        <div th:if="${habits.empty}" class="card">
+            <div class="empty-state">
+                <div class="empty-state-icon">🌱</div>
+                <div class="empty-state-text">Chưa có habit nào. Hãy tạo habit đầu tiên!</div>
+                <a href="/habits/create" class="btn-primary" style="margin-top:16px; display:inline-flex;">
+                    <i class="ti ti-plus"></i> Tạo habit ngay
+                </a>
+            </div>
+        </div>
+
+        <div class="card" th:if="${!habits.empty}">
+            <div th:each="habit : ${habits}" class="habit-item">
+                <div class="habit-left">
+                    <div class="habit-icon-box" th:style="'background:' + ${habit.color} + '22'">
+                        <span th:text="${habit.icon}"></span>
+                    </div>
+                    <div>
+                        <div class="habit-name" th:text="${habit.name}"></div>
+                        <div class="habit-meta">
+                            <span th:text="${habit.frequency == 'DAILY' ? 'Hằng ngày' : 'Hằng tuần'}"></span>
+                            · Dài nhất: <strong th:text="${habit.longestStreak}"></strong> ngày
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="streak-pill">🔥 <span th:text="${habit.currentStreak}"></span> ngày</div>
+                    <form th:action="@{/habits/{id}/checkin(id=${habit.id})}" method="post">
+                        <button type="submit"
+                                th:class="${checkedInToday.contains(habit.id)} ? 'btn-success' : 'btn-checkin'"
+                                th:disabled="${checkedInToday.contains(habit.id)}"
+                                th:text="${checkedInToday.contains(habit.id)} ? '✓ Đã xong' : 'Check-in'">
+                        </button>
+                    </form>
+                    <form th:action="@{/habits/{id}/delete(id=${habit.id})}" method="post">
+                        <button type="submit" class="btn-danger-outline"
+                                onclick="return confirm('Xóa habit này?')">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<script>
+let notifOpen = false;
+window.addEventListener('load', function() {
+    fetch('/notifications/api').then(r => r.json()).then(data => {
+        if (data.unreadCount > 0) document.getElementById('notif-badge').style.display = 'block';
+    }).catch(() => {});
+    document.getElementById('bell-btn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        notifOpen = !notifOpen;
+        document.getElementById('notif-dropdown').style.display = notifOpen ? 'block' : 'none';
+        if (notifOpen) {
+            fetch('/notifications/api').then(r => r.json()).then(data => {
+                const list = document.getElementById('notif-list');
+                if (!data.notifications.length) {
+                    list.innerHTML = '<div style="padding:20px;text-align:center;color:#a1a1aa;font-size:13px;">Không có thông báo</div>';
+                    return;
+                }
+                list.innerHTML = data.notifications.map(n => `
+                    <div class="notif-item ${n.isRead ? '' : 'unread'}">
+                        <div class="notif-msg">${n.message}</div>
+                        <div class="notif-time">${n.createdAt.substring(0,16).replace('T',' ')}</div>
+                    </div>`).join('');
+            }).catch(() => {});
+        }
+    });
+    document.addEventListener('click', function(e) {
+        if (!document.getElementById('notif-dropdown').contains(e.target) &&
+            !document.getElementById('bell-btn').contains(e.target)) {
+            notifOpen = false;
+            document.getElementById('notif-dropdown').style.display = 'none';
+        }
+    });
+});
+</script>
+</body>
+</html>

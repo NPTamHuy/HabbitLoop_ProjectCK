@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>HabitLoop - Dashboard</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<div class="app-layout">
+    <div th:replace="~{fragments/navbar :: sidebar}" th:with="activePage='dashboard'"></div>
+
+    <main class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="page-title">Xin chào, <span th:text="${user.username}"></span>! 👋</div>
+                <div class="page-subtitle" id="today-date"></div>
+            </div>
+            <div class="topbar-right">
+                <div class="notif-wrapper">
+                    <button class="bell-btn" id="bell-btn">
+                        <i class="ti ti-bell"></i>
+                        <div class="bell-dot" id="notif-badge" style="display:none;"></div>
+                    </button>
+                    <div class="notif-dropdown" id="notif-dropdown">
+                        <div class="notif-header">
+                            <span>Thông báo</span>
+                            <form th:action="@{/notifications/read-all}" method="post">
+                                <button type="submit" class="notif-read-btn">Đọc tất cả</button>
+                            </form>
+                        </div>
+                        <div id="notif-list">
+                            <div style="padding:20px; text-align:center; color:#a1a1aa; font-size:13px;">Đang tải...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="avatar-circle"
+                     th:text="${#strings.substring(user.username, 0, 2).toUpperCase()}"></div>
+            </div>
+        </div>
+
+        <!-- XP Bar -->
+        <div class="xp-card">
+            <div class="level-badge" th:text="${user.level}"></div>
+            <div class="xp-info">
+                <div class="xp-label">
+                    <span class="xp-name">Level <span th:text="${user.level}"></span></span>
+                    <span class="xp-count"><span th:text="${user.xp}"></span> XP</span>
+                </div>
+                <div class="xp-bar-bg">
+                    <div class="xp-bar-fill" th:style="'width:' + ${user.xp % 100} + '%'"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Tổng habits</div>
+                <div class="stat-value" th:text="${habitCount}">0</div>
+                <div class="stat-sub">đang theo dõi</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Check-in tuần này</div>
+                <div class="stat-value" th:text="${weeklyCheckins}">0</div>
+                <div class="stat-sub">lần hoàn thành</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Streak dài nhất 🔥</div>
+                <div class="stat-value" th:text="${bestStreak}">0</div>
+                <div class="stat-sub">ngày liên tiếp</div>
+            </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="card">
+            <div class="card-title">Check-in 7 ngày qua</div>
+            <canvas id="weeklyChart" height="70"></canvas>
+        </div>
+
+        <!-- Badges -->
+        <div class="card">
+            <div class="card-title">Thành tích 🏆</div>
+            <div th:if="${badges.empty}" class="empty-state">
+                <div class="empty-state-icon">🎖️</div>
+                <div class="empty-state-text">Duy trì streak để nhận badge đầu tiên!</div>
+            </div>
+            <div style="display:flex; gap:16px; flex-wrap:wrap;">
+                <div th:each="ub : ${badges}" style="text-align:center;">
+                    <div style="font-size:2.2rem;" th:text="${ub.badge.icon}"></div>
+                    <div style="font-size:12px; color:#71717a; margin-top:4px;"
+                         th:text="${ub.badge.name}"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script th:inline="javascript">
+    const rawLabels = /*[[${chartLabels}]]*/ "[]";
+    const rawValues = /*[[${chartValues}]]*/ "[]";
+
+    const labels = typeof rawLabels === 'string' ? JSON.parse(rawLabels) : rawLabels;
+    const values = typeof rawValues === 'string' ? JSON.parse(rawValues) : rawValues;
+
+    // Rút gọn ngày: "2026-05-25" → "25/05"
+    const shortLabels = labels.map(function(d) {
+        const parts = d.split('-');
+        return parts[2] + '/' + parts[1];
+    });
+
+    new Chart(document.getElementById('weeklyChart'), {
+        type: 'bar',
+        data: {
+            labels: shortLabels,
+            datasets: [{
+                data: values,
+                backgroundColor: '#6366f1',
+                borderRadius: 6,
+                borderSkipped: false
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 },
+                    grid: { color: '#f1f5f9' }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    document.getElementById('today-date').textContent =
+        new Date().toLocaleDateString('vi-VN', {
+            weekday:'long', year:'numeric',
+            month:'long', day:'numeric'
+        });
+</script>
+
+<script>
+let notifOpen = false;
+window.addEventListener('load', function() {
+    fetch('/notifications/api').then(r => r.json()).then(data => {
+        const badge = document.getElementById('notif-badge');
+        if (data.unreadCount > 0) badge.style.display = 'block';
+    }).catch(() => {});
+
+    document.getElementById('bell-btn').addEventListener('click', function(e) {
+        e.stopPropagation();
+        notifOpen = !notifOpen;
+        document.getElementById('notif-dropdown').style.display = notifOpen ? 'block' : 'none';
+        if (notifOpen) {
+            fetch('/notifications/api').then(r => r.json()).then(data => {
+                const badge = document.getElementById('notif-badge');
+                badge.style.display = data.unreadCount > 0 ? 'block' : 'none';
+                const list = document.getElementById('notif-list');
+                if (!data.notifications.length) {
+                    list.innerHTML = '<div style="padding:20px; text-align:center; color:#a1a1aa; font-size:13px;">Không có thông báo</div>';
+                    return;
+                }
+                list.innerHTML = data.notifications.map(n => `
+                    <div class="notif-item ${n.isRead ? '' : 'unread'}">
+                        <div class="notif-msg">${n.message}</div>
+                        <div class="notif-time">${n.createdAt.substring(0,16).replace('T',' ')}</div>
+                    </div>`).join('');
+            }).catch(() => {});
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!document.getElementById('notif-dropdown').contains(e.target) &&
+            !document.getElementById('bell-btn').contains(e.target)) {
+            notifOpen = false;
+            document.getElementById('notif-dropdown').style.display = 'none';
+        }
+    });
+});
+</script>
+</body>
+</html>

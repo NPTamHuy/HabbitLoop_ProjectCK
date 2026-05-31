@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>HabitLoop - Tạo Challenge</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+</head>
+<body>
+<div class="app-layout">
+    <div th:replace="~{fragments/navbar :: sidebar}" th:with="activePage='challenges'"></div>
+
+    <main class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="page-title">Tạo Challenge mới</div>
+                <div class="page-subtitle">Thách thức bản thân và bạn bè</div>
+            </div>
+            <a href="/challenges" class="btn-secondary">
+                <i class="ti ti-arrow-left"></i> Quay lại
+            </a>
+        </div>
+
+        <div class="card" style="max-width:560px;">
+            <form th:action="@{/challenges/create}" method="post">
+                <div class="form-group">
+                    <label class="form-label">Tên challenge *</label>
+                    <input type="text" name="title" class="form-control"
+                           placeholder="VD: 30 ngày đọc sách" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Mô tả</label>
+                    <textarea name="description" class="form-control" rows="3"
+                              style="resize:vertical;"
+                              placeholder="Mô tả mục tiêu challenge..."></textarea>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                    <div class="form-group">
+                        <label class="form-label">Ngày bắt đầu *</label>
+                        <input type="date" name="startDate" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ngày kết thúc *</label>
+                        <input type="date" name="endDate" class="form-control" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="form-check">
+                        <input type="checkbox" id="isPublic" name="isPublic" value="true">
+                        <label for="isPublic">Công khai — mọi người có thể thấy</label>
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary"
+                        style="width:100%; justify-content:center; padding:11px;">
+                    <i class="ti ti-trophy"></i> Tạo Challenge
+                </button>
+            </form>
+        </div>
+    </main>
+</div>
+</body>
+</html>

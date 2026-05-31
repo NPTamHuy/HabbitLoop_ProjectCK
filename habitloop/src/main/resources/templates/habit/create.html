@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>HabitLoop - Tạo Habit</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+</head>
+<body>
+<div class="app-layout">
+    <div th:replace="~{fragments/navbar :: sidebar}" th:with="activePage='habits'"></div>
+
+    <main class="main-content">
+        <div class="topbar">
+            <div>
+                <div class="page-title">Tạo Habit mới</div>
+                <div class="page-subtitle">Bắt đầu một thói quen tốt hôm nay</div>
+            </div>
+            <a href="/habits" class="btn-secondary">
+                <i class="ti ti-arrow-left"></i> Quay lại
+            </a>
+        </div>
+
+        <div class="card" style="max-width: 560px;">
+            <form th:action="@{/habits/create}" method="post">
+                <div class="form-group">
+                    <label class="form-label">Tên habit *</label>
+                    <input type="text" name="name" class="form-control"
+                           placeholder="VD: Đọc sách 30 phút" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Mô tả</label>
+                    <input type="text" name="description" class="form-control"
+                           placeholder="VD: Đọc ít nhất 20 trang mỗi ngày">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Chọn icon</label>
+                    <div class="icon-grid">
+                        <div class="icon-opt" data-icon="📚">📚</div>
+                        <div class="icon-opt" data-icon="🏃">🏃</div>
+                        <div class="icon-opt" data-icon="💧">💧</div>
+                        <div class="icon-opt" data-icon="🧘">🧘</div>
+                        <div class="icon-opt" data-icon="💪">💪</div>
+                        <div class="icon-opt" data-icon="🎯">🎯</div>
+                        <div class="icon-opt" data-icon="✍️">✍️</div>
+                        <div class="icon-opt" data-icon="🎸">🎸</div>
+                        <div class="icon-opt" data-icon="🍎">🍎</div>
+                        <div class="icon-opt" data-icon="😴">😴</div>
+                        <div class="icon-opt" data-icon="🧹">🧹</div>
+                        <div class="icon-opt" data-icon="💻">💻</div>
+                    </div>
+                    <input type="hidden" name="icon" id="iconInput" value="⭐">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Màu sắc</label>
+                    <input type="color" name="color" value="#6366f1"
+                           style="width:48px; height:36px; border-radius:9px; border:0.5px solid #e5e7eb; cursor:pointer; padding:2px;">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Tần suất</label>
+                    <select name="frequency" class="form-select">
+                        <option value="DAILY">Hằng ngày</option>
+                        <option value="WEEKLY">Hằng tuần</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-primary" style="width:100%; justify-content:center; padding:11px;">
+                    <i class="ti ti-check"></i> Tạo Habit
+                </button>
+            </form>
+        </div>
+    </main>
+</div>
+<script>
+document.querySelectorAll('.icon-opt').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.icon-opt').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        document.getElementById('iconInput').value = btn.getAttribute('data-icon');
+    });
+});
+</script>
+</body>
+</html>
