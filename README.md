@@ -59,7 +59,7 @@ HabitLoop là nền tảng web giúp người dùng tạo và duy trì thói que
 ---
 
 ### 6. Chi tiết Challenge & Leaderboard Realtime
-> Trang chi tiết challenge hiển thị leaderboard xếp hạng thành viên (top 3 có màu vàng/bạc/đồng), form check-in 1 click và activity feed các hoạt động gần đây. Leaderboard **tự động cập nhật realtime** qua WebSocket khi thành viên check-in mà không cần reload trang.
+> Trang chi tiết challenge hiển thị leaderboard xếp hạng thành viên (top 3 có màu vàng/bạc/đồng), form check-in 1 click và activity feed các hoạt động gần đây. Leaderboard **tự động cập nhật** qua WebSocket khi thành viên check-in mà không cần reload trang.
 
 ![Chi tiết Challenge](images/challenge_detail.png)
 
