@@ -4,7 +4,6 @@ import com.habitloop.dto.*;
 import com.habitloop.service.AuthService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +21,6 @@ public class AuthController {
         this.authService = authService;
     }
 
-    // ===== REGISTER =====
     @GetMapping("/register")
     public String registerPage(Model model) {
         model.addAttribute("registerRequest", new RegisterRequest());
@@ -48,7 +46,6 @@ public class AuthController {
         }
     }
 
-    // ===== LOGIN =====
     @GetMapping("/login")
     public String loginPage(Model model) {
         model.addAttribute("loginRequest", new LoginRequest());
@@ -59,7 +56,6 @@ public class AuthController {
     public String login(@Valid @ModelAttribute LoginRequest request,
                         BindingResult bindingResult,
                         Model model,
-                        HttpServletRequest httpRequest,
                         HttpServletResponse response) {
         if (bindingResult.hasErrors()) {
             return "auth/login";
@@ -67,23 +63,11 @@ public class AuthController {
         try {
             AuthResponse authResponse = authService.login(request);
 
-            // Lưu JWT vào Cookie
             Cookie cookie = new Cookie("jwt", authResponse.getToken());
             cookie.setHttpOnly(true);
             cookie.setPath("/");
             cookie.setMaxAge(86400);
             response.addCookie(cookie);
-
-            // Tạo session và lưu authentication
-            org.springframework.security.core.userdetails.UserDetails userDetails =
-                org.springframework.security.core.context.SecurityContextHolder
-                    .getContext().getAuthentication() != null ?
-                (org.springframework.security.core.userdetails.UserDetails)
-                    org.springframework.security.core.context.SecurityContextHolder
-                        .getContext().getAuthentication().getPrincipal() : null;
-
-            // Lưu username vào session để JwtAuthFilter đọc được
-            httpRequest.getSession(true).setAttribute("username", authResponse.getUsername());
 
             return "redirect:/dashboard";
         } catch (Exception e) {
@@ -92,13 +76,12 @@ public class AuthController {
         }
     }
 
-    // ===== LOGOUT =====
     @GetMapping("/logout")
     public String logout(HttpServletResponse response) {
         Cookie cookie = new Cookie("jwt", null);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
-        cookie.setMaxAge(0); // Xóa cookie
+        cookie.setMaxAge(0);
         response.addCookie(cookie);
         return "redirect:/auth/login";
     }

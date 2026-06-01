@@ -1,4 +1,4 @@
-package com.habitloop.security;
+package com.habitloop.service;
 
 import com.habitloop.entity.User;
 import com.habitloop.repository.UserRepository;

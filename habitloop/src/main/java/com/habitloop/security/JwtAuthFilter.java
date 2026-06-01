@@ -12,7 +12,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 
 @Component
@@ -31,9 +30,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
+
         String token = null;
 
-        // Lấy JWT từ Cookie (dùng cho Thymeleaf)
         if (request.getCookies() != null) {
             for (Cookie cookie : request.getCookies()) {
                 if ("jwt".equals(cookie.getName())) {
@@ -43,7 +42,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         }
 
-        // Fallback: lấy từ Authorization header
         if (token == null) {
             String authHeader = request.getHeader("Authorization");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
@@ -51,8 +49,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             }
         }
 
-        // Validate và set Authentication
-        if (token != null && jwtUtil.validateToken(token)) {
+        // Thêm kiểm tra SecurityContext chưa có authentication
+        if (token != null
+                && jwtUtil.validateToken(token)
+                && SecurityContextHolder.getContext().getAuthentication() == null) {
+
             String username = jwtUtil.extractUsername(token);
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
@@ -67,13 +68,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
         filterChain.doFilter(request, response);
     }
-    
+
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        return path.startsWith("/auth/") ||
-               path.startsWith("/css/") ||
-               path.startsWith("/js/") ||
-               path.startsWith("/ws/");
+        return path.startsWith("/auth/")
+            || path.startsWith("/css/")
+            || path.startsWith("/js/")
+            || path.startsWith("/ws/")
+            || path.startsWith("/webjars/");
     }
 }

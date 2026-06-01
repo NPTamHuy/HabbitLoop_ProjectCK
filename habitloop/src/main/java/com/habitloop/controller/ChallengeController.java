@@ -95,6 +95,10 @@ public class ChallengeController {
                                    @PathVariable Long id,
                                    Model model) {
         Long userId = getUserId(userDetails);
+
+        System.out.println("=== challengeDetail: id=" + id + ", userId=" + userId);
+        System.out.println("=== isMember: " + challengeService.isMember(id, userId));
+
         Challenge challenge = challengeService.getChallengeById(id);
 
         if (!challengeService.isMember(id, userId)) {
@@ -110,29 +114,36 @@ public class ChallengeController {
         model.addAttribute("currentUser", currentUser);
         return "challenge/detail";
     }
-
     // Check-in trong challenge (push WebSocket)
     @PostMapping("/{id}/checkin")
     public String checkinChallenge(@AuthenticationPrincipal UserDetails userDetails,
                                     @PathVariable Long id,
-                                    @RequestParam Long habitId,
+                                    @RequestParam(required = false) Long habitId,
                                     RedirectAttributes redirectAttributes) {
         Long userId = getUserId(userDetails);
+
         String result = challengeService.checkinChallenge(id, habitId, userId);
 
-        if ("success".equals(result)) {
-            // Checkin habit thường
-            habitService.checkin(habitId, userId);
-
-            // Push leaderboard mới qua WebSocket
-            List<ChallengeMember> leaderboard = challengeService.getLeaderboard(id);
-            messagingTemplate.convertAndSend(
-                "/topic/challenge/" + id + "/leaderboard", leaderboard);
-
-            redirectAttributes.addFlashAttribute("success", "Check-in thành công! 🔥");
-        } else {
-            redirectAttributes.addFlashAttribute("message", "Đã check-in rồi!");
+        if ("already".equals(result)) {
+            redirectAttributes.addFlashAttribute("message", "Bạn đã check-in hôm nay rồi!");
+            return "redirect:/challenges/" + id;
         }
+
+        // Push WebSocket
+        List<ChallengeMember> leaderboard = challengeService.getLeaderboard(id);
+        List<java.util.Map<String, Object>> leaderboardDto = leaderboard.stream()
+            .map(cm -> {
+                java.util.Map<String, Object> map = new java.util.HashMap<>();
+                map.put("username", cm.getUser().getUsername());
+                map.put("totalCheckins", cm.getTotalCheckins());
+                return map;
+            })
+            .collect(java.util.stream.Collectors.toList());
+
+        messagingTemplate.convertAndSend(
+            "/topic/challenge/" + id + "/leaderboard", leaderboardDto);
+
+        redirectAttributes.addFlashAttribute("success", "Check-in thành công! 🔥");
         return "redirect:/challenges/" + id;
     }
 

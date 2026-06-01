@@ -99,23 +99,32 @@ public class ChallengeService {
         return challengeMemberRepository.findLeaderboard(challengeId);
     }
 
-    // Check-in trong challenge
     public String checkinChallenge(Long challengeId, Long habitId, Long userId) {
-        if (checkinRepository.existsByHabitIdAndCheckinDate(habitId, LocalDate.now())) {
+        java.time.LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        java.time.LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+        Long count = activityFeedRepository.countCheckinToday(
+                challengeId, userId, startOfDay, endOfDay);
+        // Debug tạm
+        System.out.println("=== checkinChallenge: challengeId=" + challengeId 
+            + ", userId=" + userId + ", count=" + count);
+
+        if (count > 0) {
             return "already";
         }
+
+        ChallengeMember member = challengeMemberRepository
+                .findByChallengeIdAndUserId(challengeId, userId)
+                .orElse(null);
+
+        if (member == null) return "not_member";
 
         Challenge challenge = challengeRepository.findById(challengeId).orElseThrow();
         User user = userRepository.findById(userId).orElseThrow();
 
-        // Cập nhật totalCheckins của member
-        challengeMemberRepository.findByChallengeIdAndUserId(challengeId, userId)
-                .ifPresent(member -> {
-                    member.setTotalCheckins(member.getTotalCheckins() + 1);
-                    challengeMemberRepository.save(member);
-                });
+        member.setTotalCheckins(member.getTotalCheckins() + 1);
+        challengeMemberRepository.save(member);
 
-        // Tạo activity feed
         ActivityFeed feed = new ActivityFeed();
         feed.setUser(user);
         feed.setChallenge(challenge);
@@ -124,7 +133,6 @@ public class ChallengeService {
 
         return "success";
     }
-
     // Lấy activity feed của challenge
     public List<ActivityFeed> getActivityFeed(Long challengeId) {
         return activityFeedRepository

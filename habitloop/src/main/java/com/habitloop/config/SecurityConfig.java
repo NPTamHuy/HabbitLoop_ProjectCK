@@ -1,10 +1,12 @@
 package com.habitloop.config;
 
 import com.habitloop.security.JwtAuthFilter;
+import com.habitloop.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -17,16 +19,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final CustomUserDetailsService customUserDetailsService;
 
-    public SecurityConfig(JwtAuthFilter jwtAuthFilter) {
+    public SecurityConfig(@Lazy JwtAuthFilter jwtAuthFilter,
+                          CustomUserDetailsService customUserDetailsService) {
         this.jwtAuthFilter = jwtAuthFilter;
+        this.customUserDetailsService = customUserDetailsService;
     }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            // Bỏ STATELESS — dùng session bình thường cho Thymeleaf
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
                     "/auth/**",
@@ -53,13 +57,17 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder builder =
+            http.getSharedObject(AuthenticationManagerBuilder.class);
+        builder
+            .userDetailsService(customUserDetailsService)
+            .passwordEncoder(passwordEncoder());
+        return builder.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(
-            AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
