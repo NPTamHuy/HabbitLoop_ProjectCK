@@ -10,65 +10,12 @@ HabitLoop là nền tảng web giúp người dùng tạo và duy trì thói que
 
 ---
 
-## 🛠️ Công nghệ sử dụng
-
-Dự án được xây dựng trên mô hình **Full-Stack** với các công nghệ hiện đại:
-
-- **Backend:** Java 17, Spring Boot 4.0.6, Spring Security + JWT (Xác thực & Bảo mật)
-- **Database:** MySQL / Spring Data JPA & Hibernate (Quản lý và tương tác cơ sở dữ liệu)
-- **Frontend:** HTML5, CSS3, Thymeleaf (Engine kết xuất giao diện), Bootstrap 5, Tabler Icons
-- **Realtime:** WebSocket (STOMP + SockJS) — Leaderboard cập nhật tức thì
-- **Biểu đồ:** Chart.js — Dashboard thống kê tiến độ
-- **Công cụ quản lý thư viện:** Maven
-- **Môi trường phát triển:** Eclipse IDE, XAMPP (MySQL)
-
----
-
-## ✨ Các chức năng chính
-
-### 🔐 Xác thực (Authentication)
-- Đăng ký tài khoản với validation đầy đủ
-- Đăng nhập bảo mật bằng JWT Token lưu trong HttpOnly Cookie
-- Mật khẩu mã hóa bằng BCrypt
-
-### 📋 Quản lý Habit
-- Tạo thói quen cá nhân với tên, mô tả, icon, màu sắc và tần suất (hằng ngày / hằng tuần)
-- Check-in một lần mỗi ngày bằng một cú click
-- Hệ thống **Streak** 🔥 tự động tính toán: đếm ngày liên tiếp, reset về 0 nếu bỏ lỡ
-- Xem lịch sử và streak dài nhất của từng habit
-
-### 🏆 Challenge nhóm
-- Tạo challenge công khai hoặc riêng tư với thời hạn tùy chỉnh
-- Mời bạn bè tham gia bằng **Invite Code** 6 ký tự
-- Check-in trong challenge mỗi ngày một lần
-- **Leaderboard Realtime** — cập nhật tức thì khi thành viên check-in qua WebSocket STOMP
-
-### 🎮 Gamification
-- **Điểm XP**: +10 XP mỗi lần check-in habit
-- **Cấp độ**: Tự động tăng cấp theo tổng XP tích lũy
-- **Badge thành tích**: 🥉 Streak 7 ngày, 🥈 Streak 30 ngày, 🥇 Streak 100 ngày
-- **Activity Feed**: Hiển thị hoạt động gần đây trong challenge
-
-### 🔔 Thông báo
-- Chuông thông báo với badge số lượng chưa đọc
-- Dropdown thông báo khi challenge sắp kết thúc
-- Scheduled job tự động tạo thông báo mỗi sáng 8h
-
-### 📊 Dashboard & Thống kê
-- Biểu đồ cột check-in 7 ngày qua (Chart.js)
-- Thống kê: tổng habit, check-in tuần, streak dài nhất
-- XP Bar hiển thị tiến độ lên cấp
-- Danh sách huy hiệu đã nhận
-
----
-
 ## 🎬 Video Demo
 
 > Xem video demo đầy đủ các tính năng của HabitLoop tại link bên dưới:
 
 [![Watch Demo](https://img.shields.io/badge/▶%20Xem%20Video%20Demo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](LINK_VIDEO_CUA_BAN)
 
-> 📌 **Thay `LINK_VIDEO_CUA_BAN` bằng link YouTube / Google Drive của bạn.**
 
 ---
 
@@ -196,6 +143,58 @@ Dự án được thiết kế theo mô hình kiến trúc phân tầng tiêu ch
 |    activity_feed, notifications                       |
 +-------------------------------------------------------+
 ```
+
+---
+
+## 🛠️ Công nghệ sử dụng
+
+Dự án được xây dựng trên mô hình **Full-Stack** với các công nghệ hiện đại:
+
+- **Backend:** Java 17, Spring Boot 4.0.6, Spring Security + JWT (Xác thực & Bảo mật)
+- **Database:** MySQL / Spring Data JPA & Hibernate (Quản lý và tương tác cơ sở dữ liệu)
+- **Frontend:** HTML5, CSS3, Thymeleaf (Engine kết xuất giao diện), Bootstrap 5, Tabler Icons
+- **Realtime:** WebSocket (STOMP + SockJS) — Leaderboard cập nhật tức thì
+- **Biểu đồ:** Chart.js — Dashboard thống kê tiến độ
+- **Công cụ quản lý thư viện:** Maven
+- **Môi trường phát triển:** Eclipse IDE, XAMPP (MySQL)
+
+---
+
+## ✨ Các chức năng chính
+
+### 🔐 Xác thực (Authentication)
+- Đăng ký tài khoản với validation đầy đủ
+- Đăng nhập bảo mật bằng JWT Token lưu trong HttpOnly Cookie
+- Mật khẩu mã hóa bằng BCrypt
+
+### 📋 Quản lý Habit
+- Tạo thói quen cá nhân với tên, mô tả, icon, màu sắc và tần suất (hằng ngày / hằng tuần)
+- Check-in một lần mỗi ngày bằng một cú click
+- Hệ thống **Streak** 🔥 tự động tính toán: đếm ngày liên tiếp, reset về 0 nếu bỏ lỡ
+- Xem lịch sử và streak dài nhất của từng habit
+
+### 🏆 Challenge nhóm
+- Tạo challenge công khai hoặc riêng tư với thời hạn tùy chỉnh
+- Mời bạn bè tham gia bằng **Invite Code** 6 ký tự
+- Check-in trong challenge mỗi ngày một lần
+- **Leaderboard Realtime** — cập nhật tức thì khi thành viên check-in qua WebSocket STOMP
+
+### 🎮 Gamification
+- **Điểm XP**: +10 XP mỗi lần check-in habit
+- **Cấp độ**: Tự động tăng cấp theo tổng XP tích lũy
+- **Badge thành tích**: 🥉 Streak 7 ngày, 🥈 Streak 30 ngày, 🥇 Streak 100 ngày
+- **Activity Feed**: Hiển thị hoạt động gần đây trong challenge
+
+### 🔔 Thông báo
+- Chuông thông báo với badge số lượng chưa đọc
+- Dropdown thông báo khi challenge sắp kết thúc
+- Scheduled job tự động tạo thông báo mỗi sáng 8h
+
+### 📊 Dashboard & Thống kê
+- Biểu đồ cột check-in 7 ngày qua (Chart.js)
+- Thống kê: tổng habit, check-in tuần, streak dài nhất
+- XP Bar hiển thị tiến độ lên cấp
+- Danh sách huy hiệu đã nhận
 
 ---
 
