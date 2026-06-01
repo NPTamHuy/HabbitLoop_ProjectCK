@@ -1,6 +1,6 @@
 # 🔥 HabitLoop — Ứng dụng theo dõi thói quen & Challenge nhóm
 
-HabitLoop là nền tảng web giúp người dùng tạo và duy trì thói quen cá nhân, đồng thời tham gia các challenge nhóm với leaderboard cập nhật **realtime** qua WebSocket. Hệ thống tích hợp gamification với điểm XP, cấp độ và huy hiệu thành tích để tăng động lực người dùng.
+HabitLoop là nền tảng web giúp người dùng tạo và duy trì thói quen cá nhân, đồng thời tham gia các challenge nhóm với leaderboard cập nhật qua WebSocket. Hệ thống tích hợp gamification với điểm XP, cấp độ và huy hiệu thành tích để tăng động lực người dùng.
 
 ---
 
