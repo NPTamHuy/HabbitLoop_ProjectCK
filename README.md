@@ -14,7 +14,7 @@ HabitLoop là nền tảng web giúp người dùng tạo và duy trì thói que
 
 > Xem video demo đầy đủ các tính năng của HabitLoop tại link bên dưới:
 
-[![Watch Demo](images/demo.mp4)
+[![Watch Demo](https://img.shields.io/badge/▶%20Xem%20Video%20Demo-FF0000?style=for-the-badge&logo=googledrive&logoColor=white)](https://drive.google.com/file/d/1BKEP7UuKWEfrW5w-DxCy5O-lo3gQiRxA/view?usp=sharing)
 
 
 ---
